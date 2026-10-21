@@ -1,0 +1,115 @@
+<h2>Advanced Maintenance</h2>
+
+<p>Depots, maintenance stations and airport hangars accept three supplies: <b>fuel</b>, <b>furniture</b> and <b>machines</b>. Each facility gives them to the vehicles it maintains. Vehicles use their supplies while they move, and every supply a vehicle still has gives it a bonus. A vehicle without a supply runs with its normal value, it never gets worse than in the base game.</p>
+
+<h3>Features</h3>
+<ul>
+<li><b>Fuel</b> - +20 % top speed.</li>
+<li><b>Furniture</b> - +20 % comfort. Only vehicles that can carry passengers (or have at least one passenger wagon) use furniture; trucks and freight trains neither use it nor show it.</li>
+<li><b>Machines</b> - -20 % noise and pollution.</li>
+<li><b>Supply stocks at the facilities</b> - Every vehicle depot, maintenance station (road, tram, rail, water) and airport hangar gets a stock for each supply, holding up to 200 units. Supplies are delivered like to an industry: build a cargo station whose catchment area covers the facility and bring the cargo there. Deliveries stop when a stock is full.</li>
+<li><b>Delivery income</b> - Delivering supplies to a facility earns money like any other cargo delivery. The income is calculated by the game's own cargo payment.</li>
+<li><b>Refilling</b> - A facility refills the vehicles it maintains as soon as a supply drops below 95 %, as long as its stock has some left.</li>
+<li><b>Vehicle window</b> - The condition card shows three bars below the maintenance bar: fuel, furniture and machines, rated from very bad to very good like the condition.</li>
+<li><b>Facility window</b> - The three supplies are shown in one input stocks card, like the stocks of an industry. Expand it to see how many maintained vehicles still have each supply.</li>
+</ul>
+
+<h3>Use and cargo needed (default settings)</h3>
+<p>Supplies are only used while a vehicle moves. A full fuel supply lasts 90 days, furniture and machines last twice as long. One cargo unit fully supplies 2 buses; larger vehicles need more.</p>
+<table>
+<tr><th>Supply</th><th>Bonus</th><th>A full supply lasts</th></tr>
+<tr><td>Fuel</td><td>Top speed +20 %</td><td>90 days</td></tr>
+<tr><td>Furniture</td><td>Comfort +20 %</td><td>180 days</td></tr>
+<tr><td>Machines</td><td>Noise and pollution -20 %</td><td>180 days</td></tr>
+</table>
+<p>The bonuses stack with the effects of the base game landmarks, such as the +20 % top speed of the Houses of Parliament. They are registered with the game's own vehicle modifier system, which adds up all effects: fuel +20 % and a landmark +20 % give +40 % top speed.</p>
+<table>
+<tr><th>Vehicle</th><th>Factor</th><th>Cargo for a full supply</th><th>Fuel per year</th><th>Furniture / machines per year (each)</th></tr>
+<tr><td>Bus, truck</td><td>1</td><td>0.5 units</td><td>2 units</td><td>1 unit</td></tr>
+<tr><td>Tram</td><td>2</td><td>1 unit</td><td>4 units</td><td>2 units</td></tr>
+<tr><td>Small ship</td><td>2</td><td>1 unit</td><td>4 units</td><td>2 units</td></tr>
+<tr><td>Small aircraft, helicopter</td><td>2</td><td>1 unit</td><td>4 units</td><td>2 units</td></tr>
+<tr><td>Train</td><td>4</td><td>2 units</td><td>8 units</td><td>4 units</td></tr>
+<tr><td>Large ship</td><td>4</td><td>2 units</td><td>8 units</td><td>4 units</td></tr>
+<tr><td>Large aircraft</td><td>4</td><td>2 units</td><td>8 units</td><td>4 units</td></tr>
+</table>
+<p>"Per year" assumes a vehicle that moves all the time over 360 days. Furniture is only used by vehicles that carry passengers. Time waiting at stops and in the depot does not use supplies, so real vehicles need less. A full stock of 200 fuel units lasts 100 buses or 25 trains for a year.</p>
+
+<h3>Settings</h3>
+<ul>
+<li>Supply bonus: 10 / 20 / 30 % (default 20 %)</li>
+<li>Days a full fuel supply lasts: 30 / 60 / 90 / 120 / 180 / 360 (default 90; furniture and machines twice as long)</li>
+<li>Buses one cargo unit fully supplies: 0.25 / 0.5 / 1 to 10 (default 2)</li>
+<li>Supply storage of a facility: 100 / 200 / 400 / 800 units (default 200)</li>
+</ul>
+<p>The settings are chosen in the mod settings when starting a new game. For an existing savegame they can be changed in the mod selection before loading it. The storage setting applies to facilities built or rebuilt after the change.</p>
+
+<h3>Notes</h3>
+<ul>
+<li><b>A new game is recommended.</b> The mod also runs in an existing savegame, but every depot, maintenance station and hangar built before has to be rebuilt to get the supply stocks.</li>
+<li>Facilities built before the mod was added have no supply stocks. Rebuild them (or upgrade them) to accept supplies.</li>
+<li>New vehicles leave the depot fully supplied. Vehicles that already exist when the mod is added start fully supplied as well.</li>
+<li>The bonus uses the vehicle modifiers of the game: top speed, comfort, noise and pollution. Power, loading speed and running costs are not changed.</li>
+<li>A higher top speed only shows where the track or road allows it.</li>
+<li>Other mods that replace the construction script of depots, or write vehicle modifiers directly instead of using the game's vehicle modifier system, may conflict with this mod.</li>
+<li>Removing the mod from a running game is not recommended: the supply stocks stay in the facilities and the last bonus stays on the vehicles.</li>
+</ul>
+
+<hr>
+
+<h2>Advanced Maintenance</h2>
+
+<p>車廠、維修站與機場機庫可以接收三種補給：<b>燃油</b>、<b>家具</b>、<b>機械</b>，設施會把補給分給維修範圍內的車輛。車輛行駛時消耗補給，每種補給只要還有剩，就提供一項加成。缺少某種補給時，對應的數值回到原版，不會比原版更差。</p>
+
+<h3>功能</h3>
+<ul>
+<li><b>燃油</b>：最高速度 +20%。</li>
+<li><b>家具</b>：舒適度 +20%。只有能載客的車輛（或編組中有客車廂）會消耗家具；卡車與貨運列車不消耗，也不顯示家具列。</li>
+<li><b>機械</b>：噪音與污染 -20%。</li>
+<li><b>設施補給庫存</b>：所有車廠、維修站（道路、輕軌、鐵路、水運）與機場機庫，每種補給各有一個庫存，上限 200 單位。收貨方式和工業相同：在旁邊蓋貨運站，讓集貨範圍涵蓋設施，再把貨物運過去。庫存存滿後不再收貨。</li>
+<li><b>運送收入</b>：把補給送到設施，和運送其他貨物一樣有收入，金額照遊戲原本的貨運收入計算。</li>
+<li><b>補給</b>：車輛任一種補給低於 95% 時，維修它的設施從庫存補滿，庫存用完就停止。</li>
+<li><b>車輛視窗</b>：「狀態」卡片的維修列下方有燃油、家具、機械三列，和維修狀態一樣依存量顯示極差到極佳。</li>
+<li><b>設施視窗</b>：三種補給合併在一張「投入庫存」卡片，外觀和工業的庫存相同。展開後可以看到每種補給有幾輛維修中的車輛還有存量。</li>
+</ul>
+
+<h3>消耗與用量（預設設定）</h3>
+<p>只有行駛中會消耗補給。燃油補滿可維持 90 天，家具與機械可維持 180 天。一單位貨物可補滿 2 輛公車，大型載具需要更多。</p>
+<table>
+<tr><th>補給</th><th>加成</th><th>補滿可維持</th></tr>
+<tr><td>燃油</td><td>最高速度 +20%</td><td>90 天</td></tr>
+<tr><td>家具</td><td>舒適度 +20%</td><td>180 天</td></tr>
+<tr><td>機械</td><td>噪音與污染 -20%</td><td>180 天</td></tr>
+</table>
+<p>加成可以和原版地標的效果疊加，例如國會大廈的最高速度 +20%。本模組的加成登記在遊戲本身的車輛修正值系統，系統會把所有效果相加：燃油 +20% 加上地標 +20%，最高速度就是 +40%。</p>
+<table>
+<tr><th>載具</th><th>倍率</th><th>補滿一次的貨物量</th><th>每年燃油</th><th>每年家具／機械（各）</th></tr>
+<tr><td>公車、卡車</td><td>1</td><td>0.5 單位</td><td>2 單位</td><td>1 單位</td></tr>
+<tr><td>輕軌</td><td>2</td><td>1 單位</td><td>4 單位</td><td>2 單位</td></tr>
+<tr><td>小型船隻</td><td>2</td><td>1 單位</td><td>4 單位</td><td>2 單位</td></tr>
+<tr><td>小型飛機、直升機</td><td>2</td><td>1 單位</td><td>4 單位</td><td>2 單位</td></tr>
+<tr><td>火車</td><td>4</td><td>2 單位</td><td>8 單位</td><td>4 單位</td></tr>
+<tr><td>大型船隻</td><td>4</td><td>2 單位</td><td>8 單位</td><td>4 單位</td></tr>
+<tr><td>大型飛機</td><td>4</td><td>2 單位</td><td>8 單位</td><td>4 單位</td></tr>
+</table>
+<p>「每年」以 360 天、整段時間都在行駛計算。家具只有能載客的車輛會消耗。停站與待在車廠的時間不消耗補給，實際用量會比表上少。一座設施存滿 200 單位燃油，可供 100 輛公車或 25 列火車用一年。</p>
+
+<h3>設定</h3>
+<ul>
+<li>補給加成：10／20／30%（預設 20%）</li>
+<li>燃油補滿可維持天數：30／60／90／120／180／360（預設 90，家具與機械為 2 倍）</li>
+<li>一單位貨物可補滿的公車數：0.25／0.5／1～10（預設 2）</li>
+<li>設施補給存量上限：100／200／400／800 單位（預設 200）</li>
+</ul>
+<p>開新遊戲時在模組設定選擇。既有存檔可以在讀檔前的模組選擇頁修改。存量上限只套用在修改後新建或重建的設施。</p>
+
+<h3>注意事項</h3>
+<ul>
+<li><b>建議以新遊戲開始。</b>本模組也能在既有存檔中運作，但之前蓋好的車廠、維修站與機庫都要拆除重建，才會有補給庫存。</li>
+<li>加入模組前就蓋好的設施沒有補給庫存，拆除重建或升級後才能收貨。</li>
+<li>新車出廠時三種補給都是滿的。加入模組時已經存在的車輛，也從滿的開始。</li>
+<li>加成透過遊戲的車輛修正值作用在最高速度、舒適度、噪音與污染，功率、裝卸速度與營運成本不受影響。</li>
+<li>最高速度提高後，只有在路線限速允許的路段才看得出差別。</li>
+<li>其他替換車廠建造腳本，或不經遊戲的車輛修正值系統、直接改寫車輛修正值的模組，可能與本模組衝突。</li>
+<li>遊戲進行中請勿移除本模組：補給庫存會留在設施裡，車輛也會保留最後一次的加成。</li>
+</ul>

@@ -1,0 +1,10 @@
+# OS / editor files
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+*.bak
+*.tmp
+
+# compiled Teal output (the game compiles the .tl files itself)
+*.out.lua

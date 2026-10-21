@@ -1,0 +1,63 @@
+{
+    "modId": "advanced_maintenance",
+    "revision": 1,
+    "dependencies": null,
+    "incompatibilities": null,
+    "options": null,
+    "preRunScript": {
+        "fileName": "advanced_maintenance::/mod.script@preRunFn"
+    },
+    "runScript": {
+        "fileName": ""
+    },
+    "postRunScript": {
+        "fileName": ""
+    },
+    "severityAdd": "None",
+    "severityRemove": "Warning",
+    "cosmetic": false,
+    "visible": true,
+    "params": [
+        {
+            "key": "advanced_maintenance_bonus",
+            "name": "advanced_maintenance_bonus_name",
+            "tooltip": "advanced_maintenance_bonus_tooltip",
+            "uiType": "ComboBox",
+            "values": [ "advanced_maintenance_bonus_10", "advanced_maintenance_bonus_20", "advanced_maintenance_bonus_30" ],
+            "defaultIndex": 1,
+            "yearFrom": 0,
+            "yearTo": 0
+        },
+        {
+            "key": "advanced_maintenance_duration",
+            "name": "advanced_maintenance_duration_name",
+            "tooltip": "advanced_maintenance_duration_tooltip",
+            "uiType": "ComboBox",
+            "values": [ "advanced_maintenance_duration_30", "advanced_maintenance_duration_60", "advanced_maintenance_duration_90", "advanced_maintenance_duration_120", "advanced_maintenance_duration_180", "advanced_maintenance_duration_360" ],
+            "defaultIndex": 2,
+            "yearFrom": 0,
+            "yearTo": 0
+        },
+        {
+            "key": "advanced_maintenance_per_unit",
+            "name": "advanced_maintenance_per_unit_name",
+            "tooltip": "advanced_maintenance_per_unit_tooltip",
+            "uiType": "ComboBox",
+            "values": [ "advanced_maintenance_per_unit_0_25", "advanced_maintenance_per_unit_0_5", "advanced_maintenance_per_unit_1", "advanced_maintenance_per_unit_2", "advanced_maintenance_per_unit_3", "advanced_maintenance_per_unit_4", "advanced_maintenance_per_unit_5", "advanced_maintenance_per_unit_6", "advanced_maintenance_per_unit_7", "advanced_maintenance_per_unit_8", "advanced_maintenance_per_unit_9", "advanced_maintenance_per_unit_10" ],
+            "defaultIndex": 3,
+            "yearFrom": 0,
+            "yearTo": 0
+        },
+        {
+            "key": "advanced_maintenance_capacity",
+            "name": "advanced_maintenance_capacity_name",
+            "tooltip": "advanced_maintenance_capacity_tooltip",
+            "uiType": "ComboBox",
+            "values": [ "advanced_maintenance_capacity_100", "advanced_maintenance_capacity_200", "advanced_maintenance_capacity_400", "advanced_maintenance_capacity_800" ],
+            "defaultIndex": 1,
+            "yearFrom": 0,
+            "yearTo": 0
+        }
+    ],
+    "url": ""
+}

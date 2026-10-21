@@ -1,0 +1,15 @@
+{
+    "archives":  null,
+    "files":  [
+                  "advanced_maintenance.gs.lua",
+                  "advanced_maintenance.script.tl",
+                  "advanced_maintenance/config.tl",
+                  "advanced_maintenance/depot_construction.script.tl",
+                  "advanced_maintenance/stock.tl",
+                  "gui/advanced_maintenance/advanced_maintenance_depot.res.lua",
+                  "gui/advanced_maintenance/advanced_maintenance_replacement.res.lua",
+                  "gui/advanced_maintenance/supply_eow.script.tl",
+                  "gui/advanced_maintenance/supply_gui.tl",
+                  "mod.script.tl"
+              ]
+}
