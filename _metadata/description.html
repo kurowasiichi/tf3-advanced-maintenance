@@ -1,17 +1,20 @@
 <h2>Advanced Maintenance</h2>
 
-<p>Depots, maintenance stations and airport hangars accept three supplies: <b>fuel</b>, <b>furniture</b> and <b>machines</b>. Each facility gives them to the vehicles it maintains. Vehicles use their supplies while they move, and every supply a vehicle still has gives it a bonus. A vehicle without a supply runs with its normal value, it never gets worse than in the base game.</p>
+<p>Depots, maintenance stations and airport hangars accept four supplies: <b>fuel</b>, <b>furniture</b>, <b>machines</b> and <b>tools</b>. Each facility gives the first three to the vehicles it maintains. Vehicles use their supplies while they move, and every supply a vehicle still has gives it a bonus. A vehicle without a supply runs with its normal value, it never gets worse than in the base game. Tools stay at the facility and extend its service range.</p>
 
 <h3>Features</h3>
 <ul>
 <li><b>Fuel</b> - +20 % top speed.</li>
 <li><b>Furniture</b> - +20 % comfort. Only vehicles that can carry passengers (or have at least one passenger wagon) use furniture; trucks and freight trains neither use it nor show it.</li>
 <li><b>Machines</b> - -20 % noise and pollution.</li>
+<li><b>Tools</b> - Not given to vehicles. They pay for a larger service range of the facility, see below.</li>
+<li><b>Service range</b> - The facility window has a "Service range" option: 1x, 1.25x, 1.5x or 2x the normal maintenance range. The number of vehicles the facility can maintain at the same time grows by the same factor. A larger range uses tools every month from the facility's tool stock; the first month is paid at once. Without enough tools the range returns to 1x.</li>
 <li><b>Supply stocks at the facilities</b> - Every vehicle depot, maintenance station (road, tram, rail, water) and airport hangar gets a stock for each supply, holding up to 200 units. Supplies are delivered like to an industry: build a cargo station whose catchment area covers the facility and bring the cargo there. Deliveries stop when a stock is full.</li>
 <li><b>Delivery income</b> - Delivering supplies to a facility earns money like any other cargo delivery. The income is calculated by the game's own cargo payment.</li>
 <li><b>Refilling</b> - A facility refills the vehicles it maintains as soon as a supply drops below 95 %, as long as its stock has some left.</li>
 <li><b>Vehicle window</b> - The condition card shows three bars below the maintenance bar: fuel, furniture and machines, rated from very bad to very good like the condition.</li>
-<li><b>Facility window</b> - The three supplies are shown in one input stocks card, like the stocks of an industry. Expand it to see how many maintained vehicles still have each supply.</li>
+<li><b>Facility window</b> - The four supplies are shown in one input stocks card, like the stocks of an industry. Expand it to see how many maintained vehicles still have each supply.</li>
+<li><b>Delivery switch</b> - Every facility has an "Accept supply deliveries" switch in its window, on by default. Switched off, its stocks accept no fuel, furniture, machines or tools, so no cargo is delivered there; the vehicles are still refilled and the service range is still paid from what is already stored.</li>
 </ul>
 
 <h3>Use and cargo needed (default settings)</h3>
@@ -34,6 +37,14 @@
 <tr><td>Large aircraft</td><td>4</td><td>2 units</td><td>8 units</td><td>4 units</td></tr>
 </table>
 <p>"Per year" assumes a vehicle that moves all the time over 360 days. Furniture is only used by vehicles that carry passengers. Time waiting at stops and in the depot does not use supplies, so real vehicles need less. A full stock of 200 fuel units lasts 100 buses or 25 trains for a year.</p>
+<table>
+<tr><th>Service range and maintained vehicles</th><th>Tools per month</th><th>Tools per year</th></tr>
+<tr><td>1x</td><td>none</td><td>none</td></tr>
+<tr><td>1.25x</td><td>2 units</td><td>24 units</td></tr>
+<tr><td>1.5x</td><td>4 units</td><td>48 units</td></tr>
+<tr><td>2x</td><td>16 units</td><td>192 units</td></tr>
+</table>
+<p>A month is 30 days. Tools are used whether the vehicles move or not. On an airport the range applies to all its hangars, and each hangar pays its tools from its own tool stock. Because the 2x range is strong, it is designed to use far more tools; it is meant mainly for shipping.</p>
 
 <h3>Settings</h3>
 <ul>
@@ -55,22 +66,34 @@
 <li>Removing the mod from a running game is not recommended: the supply stocks stay in the facilities and the last bonus stays on the vehicles.</li>
 </ul>
 
+<h3>Patch notes</h3>
+<p><b>2026-10-22</b></p>
+<ul>
+<li>Added tools as a fourth supply and a service range option to the window of every facility: 1.25x, 1.5x or 2x the maintenance range and number of maintained vehicles for 2, 4 or 16 tools per month.</li>
+<li>Added a delivery switch to the window of every depot, maintenance station and hangar (on by default). Switched off, the facility accepts no supply deliveries; the vehicles are still refilled from what is stored, and the stock card keeps showing the stored amount.</li>
+<li>Furniture is only used by vehicles that can carry passengers (or have at least one passenger wagon). Trucks and freight trains no longer use furniture and do not show a furniture bar.</li>
+<li>The bonuses are now registered with the game's own vehicle modifier system, like the landmark effects. They stack with landmarks such as the Houses of Parliament and are no longer lost when a landmark effect changes.</li>
+</ul>
+
 <hr>
 
 <h2>Advanced Maintenance</h2>
 
-<p>車廠、維修站與機場機庫可以接收三種補給：<b>燃油</b>、<b>家具</b>、<b>機械</b>，設施會把補給分給維修範圍內的車輛。車輛行駛時消耗補給，每種補給只要還有剩，就提供一項加成。缺少某種補給時，對應的數值回到原版，不會比原版更差。</p>
+<p>車廠、維修站與機場機庫可以接收四種補給：<b>燃油</b>、<b>家具</b>、<b>機械</b>、<b>工具</b>。前三種由設施分給維修範圍內的車輛。車輛行駛時消耗補給，每種補給只要還有剩，就提供一項加成。缺少某種補給時，對應的數值回到原版，不會比原版更差。工具留在設施使用，用來擴大服務範圍。</p>
 
 <h3>功能</h3>
 <ul>
 <li><b>燃油</b>：最高速度 +20%。</li>
 <li><b>家具</b>：舒適度 +20%。只有能載客的車輛（或編組中有客車廂）會消耗家具；卡車與貨運列車不消耗，也不顯示家具列。</li>
 <li><b>機械</b>：噪音與污染 -20%。</li>
+<li><b>工具</b>：不分給車輛，用來支付設施擴大的服務範圍，見下一項。</li>
+<li><b>服務範圍倍率</b>：設施視窗有「服務範圍倍率」選項，可選原本維修範圍的 1、1.25、1.5 或 2 倍。可同時維修的車輛數也依同樣的倍率增加。範圍放大後，每個月從設施的工具庫存扣工具，切換時立即扣第一個月。工具不足時自動回到 1 倍。</li>
 <li><b>設施補給庫存</b>：所有車廠、維修站（道路、輕軌、鐵路、水運）與機場機庫，每種補給各有一個庫存，上限 200 單位。收貨方式和工業相同：在旁邊蓋貨運站，讓集貨範圍涵蓋設施，再把貨物運過去。庫存存滿後不再收貨。</li>
 <li><b>運送收入</b>：把補給送到設施，和運送其他貨物一樣有收入，金額照遊戲原本的貨運收入計算。</li>
 <li><b>補給</b>：車輛任一種補給低於 95% 時，維修它的設施從庫存補滿，庫存用完就停止。</li>
 <li><b>車輛視窗</b>：「狀態」卡片的維修列下方有燃油、家具、機械三列，和維修狀態一樣依存量顯示極差到極佳。</li>
-<li><b>設施視窗</b>：三種補給合併在一張「投入庫存」卡片，外觀和工業的庫存相同。展開後可以看到每種補給有幾輛維修中的車輛還有存量。</li>
+<li><b>設施視窗</b>：四種補給合併在一張「投入庫存」卡片，外觀和工業的庫存相同。展開後可以看到每種補給有幾輛維修中的車輛還有存量。</li>
+<li><b>收貨開關</b>：每座設施的視窗都有「接收補給貨物」開關，預設開啟。關閉後，庫存不再接收燃油、家具、機械與工具，貨運不會再把補給送來；庫存裡已有的補給，照樣補給維修中的車輛，也照樣支付服務範圍的工具。</li>
 </ul>
 
 <h3>消耗與用量（預設設定）</h3>
@@ -93,6 +116,14 @@
 <tr><td>大型飛機</td><td>4</td><td>2 單位</td><td>8 單位</td><td>4 單位</td></tr>
 </table>
 <p>「每年」以 360 天、整段時間都在行駛計算。家具只有能載客的車輛會消耗。停站與待在車廠的時間不消耗補給，實際用量會比表上少。一座設施存滿 200 單位燃油，可供 100 輛公車或 25 列火車用一年。</p>
+<table>
+<tr><th>服務範圍與可維修車輛數倍率</th><th>每月工具</th><th>每年工具</th></tr>
+<tr><td>1 倍</td><td>不消耗</td><td>不消耗</td></tr>
+<tr><td>1.25 倍</td><td>2 單位</td><td>24 單位</td></tr>
+<tr><td>1.5 倍</td><td>4 單位</td><td>48 單位</td></tr>
+<tr><td>2 倍</td><td>16 單位</td><td>192 單位</td></tr>
+</table>
+<p>一個月以 30 天計。工具不論車輛有沒有行駛都會消耗。機場的倍率套用在所有機庫，每個機庫各自從自己的工具庫存扣工具。由於 2 倍範圍的效果強勢，設計上消耗會大幅提高，建議用在海運。</p>
 
 <h3>設定</h3>
 <ul>
@@ -112,4 +143,13 @@
 <li>最高速度提高後，只有在路線限速允許的路段才看得出差別。</li>
 <li>其他替換車廠建造腳本，或不經遊戲的車輛修正值系統、直接改寫車輛修正值的模組，可能與本模組衝突。</li>
 <li>遊戲進行中請勿移除本模組：補給庫存會留在設施裡，車輛也會保留最後一次的加成。</li>
+</ul>
+
+<h3>更新紀錄</h3>
+<p><b>2026-10-22</b></p>
+<ul>
+<li>新增第四種補給「工具」，以及每座設施視窗的「服務範圍倍率」選項：1.25、1.5、2 倍維修範圍與可維修車輛數，每月分別消耗 2、4、16 單位工具。</li>
+<li>每座車廠、維修站與機庫的視窗新增收貨開關，預設開啟。關閉後，設施不再接收補給貨物；庫存裡已有的補給照樣補給車輛，庫存卡片也照常顯示實際存量。</li>
+<li>家具改為只有能載客的車輛（或編組中有客車廂）會消耗。卡車與貨運列車不再消耗家具，也不顯示家具列。</li>
+<li>加成改為登記在遊戲本身的車輛修正值系統，做法和地標效果相同。現在可以和國會大廈等地標疊加，地標效果變動時也不會再被覆寫。</li>
 </ul>

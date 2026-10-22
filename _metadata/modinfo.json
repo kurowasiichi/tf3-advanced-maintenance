@@ -1,12 +1,12 @@
 {
     "name": "Advanced Maintenance",
-    "summary": "Supplies for all vehicles: deliver fuel, furniture and machines to depots, maintenance stations and hangars for faster, more comfortable and cleaner vehicles.",
-    "description": "Depots, maintenance stations and hangars accept three supplies like an industry: build a cargo station whose catchment area covers the facility and deliver fuel, furniture or machines to it. The facility supplies the vehicles it maintains, and the vehicles use their supplies while they move. Fuel gives +20 % top speed, furniture +20 % comfort, machines -20 % noise and pollution; without a supply the vehicle runs with its normal value. The bonus, the days a full supply lasts, the vehicles per cargo unit and the storage of the facilities are set in the mod settings.",
+    "summary": "Supplies for all vehicles: deliver fuel, furniture and machines to depots, maintenance stations and hangars for faster, more comfortable and cleaner vehicles, and tools for a larger service range.",
+    "description": "Depots, maintenance stations and hangars accept four supplies like an industry: build a cargo station whose catchment area covers the facility and deliver fuel, furniture, machines or tools to it. The facility supplies the vehicles it maintains, and the vehicles use their supplies while they move. Fuel gives +20 % top speed, furniture +20 % comfort, machines -20 % noise and pollution; without a supply the vehicle runs with its normal value. Tools pay for a service range of 1.25x, 1.5x or 2x, chosen in the facility window. The bonus, the days a full supply lasts, the vehicles per cargo unit and the storage of the facilities are set in the mod settings.",
     "localization": {
         "zh_TW": {
             "name": "Advanced Maintenance",
-            "summary": "替所有車輛加上補給：把燃油、家具與機械送到車廠、維修站與機庫，讓車輛更快、更舒適、更乾淨。",
-            "description": "車廠、維修站與機庫像工業一樣收三種補給：在旁邊蓋貨運站，讓集貨範圍涵蓋設施，再把燃油、家具或機械送過去。設施會替它維修的車輛補給，車輛行駛時消耗補給。燃油讓最高速度 +20%，家具讓舒適度 +20%，機械讓噪音與污染 -20%；缺少某種補給時，對應的數值維持原本。加成比例、補給可維持天數、每單位貨物可補滿的車輛數與設施存量上限，都在模組設定中調整。"
+            "summary": "替所有車輛加上補給：把燃油、家具與機械送到車廠、維修站與機庫，讓車輛更快、更舒適、更乾淨；工具則用來擴大服務範圍。",
+            "description": "車廠、維修站與機庫像工業一樣收四種補給：在旁邊蓋貨運站，讓集貨範圍涵蓋設施，再把燃油、家具、機械或工具送過去。設施會替它維修的車輛補給，車輛行駛時消耗補給。燃油讓最高速度 +20%，家具讓舒適度 +20%，機械讓噪音與污染 -20%；缺少某種補給時，對應的數值維持原本。工具可用來擴展 1.25、1.5 或 2 倍的服務範圍，在設施視窗中選擇。加成比例、補給可維持天數、每單位貨物可補滿的車輛數與設施存量上限，都在模組設定中調整。"
         }
     },
     "authors": [

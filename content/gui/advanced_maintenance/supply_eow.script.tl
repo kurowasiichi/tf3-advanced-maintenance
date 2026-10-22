@@ -15,6 +15,7 @@ local vehicle_util = ug_require "::/gui/line_vehicle_mgmt/vehicle_util.tl" as Ve
 local config = ug_require "/advanced_maintenance/config.tl" as AmConfig
 local supply_gui = ug_require "/gui/advanced_maintenance/supply_gui.tl" as AmGuiState
 local stock = ug_require "/advanced_maintenance/stock.tl" as AmStock
+local range = ug_require "/advanced_maintenance/range.tl" as AmRange
 
 local RefreshInterval <const> = 1.0
 --- icon of the condition row in the vehicle window (vehicle_eow.script.tl, VehicleConditionPlugin)
@@ -171,6 +172,38 @@ local function primaryStock(stocks : {string : Engine.Entity}) : Engine.Entity
 	return -1
 end
 
+--- The supply stocks of the construction of a stock list entity, and which of them the entity is.
+local record StockInfo
+	stocks : {string : Engine.Entity}
+	key : string
+	depot : Engine.Entity
+end
+
+local function stockInfo(entity : Engine.Entity) : StockInfo
+	local constructionEntity = api.engine.system.streetConnectorSystem.getConstructionEntityForSubconstruction(entity)
+	local stocks = stock.inConstruction(constructionEntity)
+	for key, e in pairs(stocks) do
+		if e == entity then
+			local construction = api.engine.getComponent(constructionEntity, api.type.ComponentType.CONSTRUCTION) as Engine.Component.Construction
+			return { stocks = stocks, key = key, depot = construction.depots[1] }
+		end
+	end
+	return nil
+end
+
+--- while deliveries are switched off the stock is kept full, the units really stored are AmDepotStock.reserve
+local function showReserve(configs : {CargoUtil.StockConfig}, depot : Engine.Entity, key : string)
+	local s = supply_gui.get()
+	local d = s ~= nil and s.depots ~= nil and s.depots[depot] or nil
+	local ds = d ~= nil and d.stocks ~= nil and d.stocks[key] or nil
+	if ds == nil or ds.reserve == nil then
+		return
+	end
+	for __, c in ipairs(configs) do
+		c.stored = ds.reserve
+	end
+end
+
 --- The stock card (entity_window_util.CombinedStockGroupedCounts) shows the stocks of one stock list, found by
 --- cargo_util.calculateStockConfigs. For the primary supply stock of a facility the configs of the other supply stocks
 --- are added, so all supplies are shown in one card.
@@ -184,26 +217,21 @@ local function wrapStockConfigs()
 	cargo_util.calculateStockConfigs = function(entity : Engine.Entity, max? : integer, calculateQuality? : boolean,
 			sortByType? : boolean, showEmpty? : boolean, groupStocks? : boolean, producedOnly? : boolean) : {CargoUtil.StockConfig}, integer, boolean
 		local configs, maxIcons, invert = original(entity, max, calculateQuality, sortByType, showEmpty, groupStocks, producedOnly)
-		local ok, others = pcall(function() : {Engine.Entity}
-			local constructionEntity = api.engine.system.streetConnectorSystem.getConstructionEntityForSubconstruction(entity)
-			local stocks = stock.inConstruction(constructionEntity)
-			local result : {Engine.Entity} = {}
-			if primaryStock(stocks) ~= entity then
-				return result
-			end
+		local ok, info = pcall(stockInfo, entity)
+		if not ok or info == nil then
+			return configs, maxIcons, invert
+		end
+		configs = configs or {}
+		showReserve(configs, info.depot, info.key)
+		if primaryStock(info.stocks) == entity then
 			for __, supply in ipairs(config.Supplies) do
-				local other = stocks[supply.key]
+				local other = info.stocks[supply.key]
 				if other ~= nil and other ~= entity then
-					result[#result + 1] = other
-				end
-			end
-			return result
-		end)
-		if ok and others ~= nil and #others > 0 then
-			configs = configs or {}
-			for __, other in ipairs(others) do
-				for __, c in ipairs(original(other, max, calculateQuality, sortByType, showEmpty, groupStocks, producedOnly) or {}) do
-					configs[#configs + 1] = c
+					local otherConfigs = original(other, max, calculateQuality, sortByType, showEmpty, groupStocks, producedOnly) or {}
+					showReserve(otherConfigs, info.depot, supply.key)
+					for __, c in ipairs(otherConfigs) do
+						configs[#configs + 1] = c
+					end
 				end
 			end
 		end
@@ -263,16 +291,90 @@ local DepotVehicles = react.RegisterRecipe("AmDepotVehicles", function(param : E
 
 	local lines : {TreeNodeId} = {}
 	for __, supply in ipairs(config.Supplies) do
-		local cargo = cargoOf(supply)
-		local name = cargo ~= nil and cargo.name or supply.key
-		local line = string.format(_("advanced_maintenance_depot_vehicles"), name, info.supplied[supply.key], info.users[supply.key])
-		lines[#lines + 1] = text(line)
+		-- tools are used by the facility, not by vehicles
+		if not supply.facilityOnly then
+			local cargo = cargoOf(supply)
+			local name = cargo ~= nil and cargo.name or supply.key
+			local line = string.format(_("advanced_maintenance_depot_vehicles"), name, info.supplied[supply.key], info.users[supply.key])
+			lines[#lines + 1] = text(line)
+		end
 	end
 	return builtin.BoxLayout{ orientation = builtin.type.Orientation.Vertical, children = lines }
 end)
 
 local NoOutput = react.RegisterRecipe("AmNoOutput", function() : TreeNodeId
 	return builtin.BoxLayout{}
+end)
+
+--- the delivery switch of the facility: off makes its stocks accept no cargo (the vehicles are still refilled from what is stored)
+local SupplySwitch = react.RegisterRecipe("AmSupplySwitch", function(param : EntityParam) : TreeNodeId
+	local depot = supply_gui.depotOf(param.entityId)
+	local engineEnabled = engine_react_util.useStepStateTimer(function() : boolean
+		return depot == nil or supply_gui.isSupplyEnabled(depot)
+	end, 0.25):old()
+	-- shows the click at once, until the game script has handled the event
+	local pending : ReactStateT<boolean> = react.useState(nil)
+	local enabled = engineEnabled
+	if pending:old() ~= nil then
+		enabled = pending:old()
+	end
+	return builtin.BoxLayout{
+		child = builtin.CheckBox{
+			label = _("advanced_maintenance_switch_label"),
+			value = enabled and 1 or 0,
+			onValueChange = function(v : integer)
+				if depot == nil then
+					return
+				end
+				pending:set(v == 1)
+				supply_gui.setSupplyEnabled(depot, v == 1)
+			end,
+		},
+	}
+end)
+
+--- the service range of the facility: the options rebuild the construction with the factor (advanced_maintenance/range.tl),
+--- the game script pays the tools every month
+local RangeSelector = react.RegisterRecipe("AmRangeSelector", function(param : EntityParam) : TreeNodeId
+	local depot = supply_gui.depotOf(param.entityId)
+	local constructionEntity = depot ~= nil and api.engine.system.streetConnectorSystem.getConstructionEntityForDepot(depot) or -1
+	local factor = engine_react_util.useStepStateTimer(function() : number
+		return range.factorOf(constructionEntity)
+	end, RefreshInterval):old()
+
+	local items : {TreeNodeId} = {}
+	local selected = 1
+	for i, level in ipairs(config.RangeLevels) do
+		local label : string
+		if level.toolsPerMonth <= 0 then
+			label = string.format(_("advanced_maintenance_range_item_free"), tostring(level.factor))
+		else
+			label = string.format(_("advanced_maintenance_range_item"), tostring(level.factor), level.toolsPerMonth)
+		end
+		items[#items + 1] = builtin.ComboBoxItem{ value = i, content = text(label) }
+		if math.abs(level.factor - factor) < 0.001 then
+			selected = i
+		end
+	end
+	return builtin.BoxLayout{
+		orientation = builtin.type.Orientation.Vertical,
+		children = {
+			builtin.ComboBox{
+				value = selected,
+				items = items,
+				onValueChange = function(v : integer|number|string)
+					local level = config.RangeLevels[math.floor(tonumber(v) or 1)]
+					if level == nil or constructionEntity < 0 or math.abs(level.factor - factor) < 0.001 then
+						return
+					end
+					if not range.setFactor(constructionEntity, level.factor) then
+						log.message("[advanced_maintenance] service range: the game refused the rebuild of " .. tostring(constructionEntity))
+					end
+				end,
+			},
+			text(_("advanced_maintenance_range_hint")),
+		},
+	}
 end)
 
 --- The supply stocks are shown with the stock widget of the industry window (IndustryCombinedStockGroupedCountsPlugin).
@@ -294,22 +396,41 @@ supply_eow.DepotFuelPlugin = react.RegisterPluginRecipe(maintenance_station_eow.
 		}
 	end
 	return builtin.BoxLayout{
-		child = entity_window_util.CombinedStockGroupedCounts{
-			initialCalloutTextInputPermanent = "",
-			-- the stock widget needs the expanded parts (entity_window_util.tl indexes them unconditionally)
-			initialCalloutTextInputCollapsible = "",
-			recipeAndParamInputCollapsible = entity_window_util.makeRecipeAndParam(DepotVehicles, { entityId = params.entityId }),
-			initialCalloutTextOutputPermanent = "",
-			initialCalloutTextOutputCollapsible = "",
-			recipeAndParamOutputCollapsible = content_card.makeRecipe0(NoOutput),
-			cardKey = "advancedMaintenanceStock",
-			setCollapsibleExpanded = params.setCollapsibleExpanded,
-			getCollapsibleExpanded = params.getCollapsibleExpanded,
-			gameCtx = params.gameCtx,
-			showOnRightSide = params.showCalloutOnRightSide,
-			showSimplifiedOnly = false,
-			entityId = stockList,
-		}
+		orientation = builtin.type.Orientation.Vertical,
+		children = {
+			entity_window_util.CombinedStockGroupedCounts{
+				initialCalloutTextInputPermanent = "",
+				-- the stock widget needs the expanded parts (entity_window_util.tl indexes them unconditionally)
+				initialCalloutTextInputCollapsible = "",
+				recipeAndParamInputCollapsible = entity_window_util.makeRecipeAndParam(DepotVehicles, { entityId = params.entityId }),
+				initialCalloutTextOutputPermanent = "",
+				initialCalloutTextOutputCollapsible = "",
+				recipeAndParamOutputCollapsible = content_card.makeRecipe0(NoOutput),
+				cardKey = "advancedMaintenanceStock",
+				setCollapsibleExpanded = params.setCollapsibleExpanded,
+				getCollapsibleExpanded = params.getCollapsibleExpanded,
+				gameCtx = params.gameCtx,
+				showOnRightSide = params.showCalloutOnRightSide,
+				showSimplifiedOnly = false,
+				entityId = stockList,
+			},
+			content_card.ContentCard{
+				title = _("advanced_maintenance_switch_title"),
+				initialCalloutTextPermanent = "",
+				recipeAndParamPermanent = content_card.makeRecipeAndParam(SupplySwitch, { entityId = params.entityId }),
+				hasPermanentFocusables = true,
+				gameCtx = params.gameCtx,
+				showOnRightSide = params.showCalloutOnRightSide,
+			},
+			content_card.ContentCard{
+				title = _("advanced_maintenance_range_title"),
+				initialCalloutTextPermanent = "",
+				recipeAndParamPermanent = content_card.makeRecipeAndParam(RangeSelector, { entityId = params.entityId }),
+				hasPermanentFocusables = true,
+				gameCtx = params.gameCtx,
+				showOnRightSide = params.showCalloutOnRightSide,
+			},
+		},
 	}
 end)
 

@@ -53,6 +53,9 @@ function stock.carriesPassengers(tv : Engine.Component.TransportVehicle) : boole
 end
 
 function stock.usesSupply(tv : Engine.Component.TransportVehicle, supply : AmSupply) : boolean
+	if supply.facilityOnly then
+		return false
+	end
 	return not supply.passengersOnly or stock.carriesPassengers(tv)
 end
 

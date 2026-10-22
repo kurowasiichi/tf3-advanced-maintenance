@@ -12,6 +12,8 @@ global record AmSupply
 	drainRate : number
 	--- only vehicles that can carry passengers use the supply (and get its bonus)
 	passengersOnly : boolean
+	--- used by the facility itself (tools for the service range), not given to vehicles
+	facilityOnly : boolean
 end
 
 --- Settings, from the mod parameters (mod.json). They apply to every supply.
@@ -40,10 +42,24 @@ global record AmDepotStock
 	delivered : number
 	--- units given to vehicles in total (diagnostics)
 	refueled : number
+	--- units of the stock while deliveries are switched off (the stock itself is kept full), nil when switched on
+	reserve : integer
 end
 
 global record AmDepot
 	stocks : {string : AmDepotStock}
+	--- service range factor the tools were last paid for (1 = none)
+	rangeFactor : number
+	--- calendar days since the tools of the service range were last paid
+	rangeDays : number
+	--- false when the player switched off the deliveries to the facility (nil = on): its stocks accept no cargo
+	enabled : boolean
+end
+
+--- Parameters of the supply switch event sent by the facility window (id AmConfig.EventId).
+global record AmSupplySwitchEvent
+	depot : Engine.Entity
+	enabled : boolean
 end
 
 --- Game script state (advanced_maintenance.script.tl).
@@ -60,6 +76,14 @@ global record AmState
 	passes : integer
 	--- how the bonuses are applied, see ModifierRevision in advanced_maintenance.script.tl
 	modifierRevision : integer
+end
+
+--- A service range option of the facility window.
+global record AmRangeLevel
+	--- factor of the catchment radius of the facility
+	factor : number
+	--- tool units used per month (30 days)
+	toolsPerMonth : integer
 end
 
 --- Cargo units a full supply takes, relative to a bus.
@@ -81,6 +105,15 @@ global record AmConfig
 	GameScript : string
 	--- the supplies in display order
 	Supplies : {AmSupply}
+	--- service range options, the first one is the default (factor 1, no tools)
+	RangeLevels : {AmRangeLevel}
+	--- construction parameter holding the service range factor
+	RangeParam : string
+	--- calendar days between two payments of the service range
+	RangeMonthDays : number
+	--- event id and name of the supply switch of a facility (GUI -> game script)
+	EventId : string
+	SupplySwitchEventName : string
 	--- capacity of the supply stocks added to the facilities when the parameter is missing
 	StockCapacity : integer
 	--- capacity of the supply stocks selected in the mod parameters
@@ -115,12 +148,25 @@ global record AmStock
 	usesSupply : function(tv : Engine.Component.TransportVehicle, supply : AmSupply) : boolean
 end
 
+--- Service range of a facility (advanced_maintenance/range.tl).
+global record AmRange
+	--- the option of the factor (the first option for unknown factors)
+	levelOf : function(factor : number) : AmRangeLevel
+	--- the factor in the construction parameters (1 when not set)
+	factorOf : function(constructionEntity : Engine.Entity) : number
+	--- rebuilds the construction with the factor, false when the game refuses the rebuild
+	setFactor : function(constructionEntity : Engine.Entity, factor : number) : boolean
+end
+
 --- Reading the state from the GUI.
 global record AmGuiState
 	--- the game script state, nil when the game script is not running
 	get : function() : AmState
 	--- the depot entity of a maintenance facility window (the window may be opened for the depot or for its construction)
 	depotOf : function(entity : Engine.Entity) : Engine.Entity
+	--- whether the facility accepts deliveries (the switch in the facility window)
+	isSupplyEnabled : function(depot : Engine.Entity) : boolean
+	setSupplyEnabled : function(depot : Engine.Entity, enabled : boolean)
 end
 
 recordDef = false

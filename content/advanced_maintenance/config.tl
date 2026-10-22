@@ -11,7 +11,19 @@ local config : AmConfig = {
 		{ key = "fuel", cargo = "::/cargos/fuel/fuel.cargo", tag = 7300, drainRate = 1 },               -- top speed
 		{ key = "furniture", cargo = "::/cargos/furniture/furniture.cargo", tag = 7301, drainRate = 0.5, passengersOnly = true }, -- comfort
 		{ key = "machines", cargo = "::/cargos/machines/machines.cargo", tag = 7302, drainRate = 0.5 },    -- noise and pollution
+		-- facilityOnly: paid monthly for the service range of the facility (RangeLevels), not given to vehicles
+		{ key = "tools", cargo = "::/cargos/tools/tools.cargo", tag = 7303, drainRate = 0, facilityOnly = true },
 	},
+	RangeLevels = {
+		{ factor = 1, toolsPerMonth = 0 },
+		{ factor = 1.25, toolsPerMonth = 2 },
+		{ factor = 1.5, toolsPerMonth = 4 },
+		{ factor = 2, toolsPerMonth = 16 },
+	},
+	RangeParam = "advancedMaintenanceRange",
+	RangeMonthDays = 30,
+	EventId = "AdvancedMaintenance",
+	SupplySwitchEventName = "setSupplyEnabled",
 	StockCapacity = 200,
 	-- the values of the parameters in mod.json
 	DurationSteps = { 30, 60, 90, 120, 180, 360 },

@@ -36,7 +36,13 @@
         "advanced_maintenance_title": "Supplies",
         "advanced_maintenance_bar_tooltip": "%s: %d %%",
         "advanced_maintenance_depot_vehicles": "%s: %d of %d maintained vehicles supplied",
-        "advanced_maintenance_depot_no_stock": "This facility has no supply stocks. It was built before the mod was added: rebuild it to accept fuel, furniture and machines."
+        "advanced_maintenance_depot_no_stock": "This facility has no supply stocks. It was built before the mod was added: rebuild it to accept fuel, furniture and machines.",
+        "advanced_maintenance_switch_title": "Deliveries",
+        "advanced_maintenance_switch_label": "Accept supply deliveries",
+        "advanced_maintenance_range_title": "Service range",
+        "advanced_maintenance_range_item_free": "%sx (no tools)",
+        "advanced_maintenance_range_item": "%sx (%d tools per month)",
+        "advanced_maintenance_range_hint": "Range and number of maintained vehicles grow by the factor. The tools are paid from the facility's tool stock, the first month at once; without enough tools the range returns to 1x."
     },
     "zh_TW": {
         "advanced_maintenance_bonus_name": "補給加成",
@@ -75,6 +81,12 @@
         "advanced_maintenance_title": "補給",
         "advanced_maintenance_bar_tooltip": "%s：%d %%",
         "advanced_maintenance_depot_vehicles": "%s：維修中車輛 %d／%d 輛有補給",
-        "advanced_maintenance_depot_no_stock": "這座設施沒有補給庫存，它在加入模組前就已建好。拆除重建後才能收燃油、家具與機械。"
+        "advanced_maintenance_depot_no_stock": "這座設施沒有補給庫存，它在加入模組前就已建好。拆除重建後才能收燃油、家具與機械。",
+        "advanced_maintenance_switch_title": "補給收貨",
+        "advanced_maintenance_switch_label": "接收補給貨物",
+        "advanced_maintenance_range_title": "服務範圍倍率",
+        "advanced_maintenance_range_item_free": "%s 倍（不消耗工具）",
+        "advanced_maintenance_range_item": "%s 倍（每月 %d 單位工具）",
+        "advanced_maintenance_range_hint": "服務範圍與可維修車輛數依倍率增加。工具從設施的工具庫存扣除，切換時立即扣第一個月；工具不足時自動回到 1 倍。"
     }
 }

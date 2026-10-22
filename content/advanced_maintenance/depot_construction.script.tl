@@ -102,6 +102,28 @@ local function addStocks(result : table, capacity : integer)
 	end
 end
 
+--- the service range of the facility window (advanced_maintenance/range.tl): the catchment radius and the number of
+--- vehicles that can be maintained (maintenance pool) of the depots times the factor in the construction parameters
+local function applyRange(result : table, constrParams : table)
+	local factor = constrParams ~= nil and tonumber(constrParams[config.RangeParam]) or nil
+	if factor == nil or factor == 1 then
+		return
+	end
+	for _, sub in ipairs(result.subconstructions as {table} or {}) do
+		local depot = sub.depot as table
+		if depot ~= nil then
+			local area = depot.catchmentArea as table
+			if area ~= nil and tonumber(area.radius) ~= nil then
+				area.radius = (area.radius as number) * factor
+			end
+			local pool = tonumber(depot.maintenancePool)
+			if pool ~= nil then
+				depot.maintenancePool = math.floor(pool * factor + 0.5)
+			end
+		end
+	end
+end
+
 local script = {}
 
 function script.constructWithModules(params : ConstructParams) : table
@@ -112,9 +134,10 @@ function script.constructWithModules(params : ConstructParams) : table
 	local original = util.useFn(settings and settings.originalScript or DefaultConstructionScript) as function(ConstructParams) : table
 	local result = original(params)
 	if result ~= nil then
-		-- never break a construction because of the supply stocks
+		-- never break a construction because of the supply stocks or the service range
 		local ok, err = pcall(function() : boolean
 			addStocks(result, settings and settings.stockCapacity or DefaultStockCapacity)
+			applyRange(result, params.constrParams)
 			return true
 		end)
 		if not ok then

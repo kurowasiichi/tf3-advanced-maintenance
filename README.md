@@ -9,6 +9,7 @@
 | 燃油 | `::/cargos/fuel/fuel.cargo` | 最高速度 +X% |
 | 家具 | `::/cargos/furniture/furniture.cargo` | 舒適度 +X% |（只有能載客的車輛）
 | 機械 | `::/cargos/machines/machines.cargo` | 噪音、污染 −X% |
+| 工具 | `::/cargos/tools/tools.cargo` | 不給車輛，支付設施的服務範圍倍率（見下） |
 
 X 預設 20。三種補給各自計量：車輛缺少哪一種，就只有那一項回到原版數值。
 
@@ -50,6 +51,22 @@ X 預設 20。三種補給各自計量：車輛缺少哪一種，就只有那一
 
 - 車輛視窗的「狀態」卡片：維修列下方依序是燃油、家具、機械三列，樣式與維修列相同（`RatingBar`），圖示是各自的貨物圖示，文字用 `vehicle_util.getConditionText` 依百分比顯示極差到極佳。
 - 維修設施視窗：三種補給庫存合併在一張工業樣式的「投入庫存」卡片（`CombinedStockGroupedCounts`）。展開後顯示各補給有幾輛維修中車輛有存量。
+- 維修設施視窗的「補給收貨」卡片：核取方塊「接收補給貨物」，預設開啟。關閉時，遊戲腳本把三個庫存的實際貨量記在 `AmDepotStock.reserve`，再以 `api.cmd.debug.makeStockSetCargoAmountCmd` 把庫存設成滿的；滿的庫存不是貨運的目的地。關閉期間車輛從 `reserve` 補給，庫存卡片也顯示 `reserve`（包裝 `cargo_util.calculateStockConfigs`），每一輪若庫存低於上限就再補滿（建築重建或升級後也一樣）。開啟時把庫存設回 `reserve`。`makeStockListSetStocksCargoTypeCmd` 清空貨物類型的做法試過，對 `INPUT_STOCK` 沒有作用。開關以 `makeScriptingSendEventCmd("", "AdvancedMaintenance", "setSupplyEnabled", { depot, enabled })` 送給遊戲腳本，存在 `AmDepot.enabled`（nil 代表開啟），跟著存檔走。
+
+## 服務範圍倍率
+
+設施視窗的「服務範圍倍率」下拉選單（`supply_eow.script.tl` 的 `RangeSelector`），選項在 [config.tl](content/advanced_maintenance/config.tl) 的 `RangeLevels`：
+
+| 倍率 | 每月工具 |
+|---|---|
+| 1 | 0 |
+| 1.25 | 2 |
+| 1.5 | 4 |
+| 2 | 16 |
+
+- API 不能在遊戲中途改服務範圍。倍率存在建築參數 `advancedMaintenanceRange`，切換時照原版倉庫切換貨物的做法，以 `createProposalReplaceConstruction` 加 `makeWorldBuildProposalCmd` 用新參數重建（[range.tl](content/advanced_maintenance/range.tl)）；建築腳本把 depot 的 `catchmentArea.radius` 與可同時維修的車輛數 `maintenancePool`（四捨五入）乘上倍率。實測重建不影響設施本身。
+- 遊戲腳本（`updateRanges`）在倍率改變時立即從工具庫存扣第一個月，之後每 30 天扣一次；工具不足時重建回 1 倍。機場的倍率套用在所有機庫，每個機庫各自扣自己的工具。
+- 讀取舊狀態時，替新增的補給補上 `levels` / `applied` 表，舊存檔不會因為新增補給而出錯。
 
 ## 實作
 

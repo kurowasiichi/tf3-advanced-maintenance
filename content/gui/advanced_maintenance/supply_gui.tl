@@ -29,4 +29,15 @@ function supply_gui.depotOf(entity : Engine.Entity) : Engine.Entity
 	return nil
 end
 
+function supply_gui.isSupplyEnabled(depot : Engine.Entity) : boolean
+	local s = supply_gui.get()
+	local d = s ~= nil and s.depots ~= nil and s.depots[depot] or nil
+	return d == nil or d.enabled ~= false
+end
+
+function supply_gui.setSupplyEnabled(depot : Engine.Entity, enabled : boolean)
+	local e : AmSupplySwitchEvent = { depot = depot, enabled = enabled }
+	api.cmd.sendCommand(api.cmd.makeScriptingSendEventCmd("", config.EventId, config.SupplySwitchEventName, e))
+end
+
 return supply_gui

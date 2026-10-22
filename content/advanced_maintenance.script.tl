@@ -12,6 +12,7 @@
 
 local config = ug_require "/advanced_maintenance/config.tl" as AmConfig
 local stock = ug_require "/advanced_maintenance/stock.tl" as AmStock
+local range = ug_require "/advanced_maintenance/range.tl" as AmRange
 
 local StateVersion <const> = 2
 --- 2: the bonuses go through the vehicle modifier game script (VehicleModifier / ChangeModifier events)
@@ -57,6 +58,11 @@ local function loadState(raw : table) : AmState
 			s.applied = emptyTables()
 			s.modifierRevision = ModifierRevision
 			log.message("[advanced_maintenance] bonuses moved to the vehicle modifier script")
+		end
+		-- supplies added after the state was created (e.g. the tools) have no tables yet
+		for _, supply in ipairs(config.Supplies) do
+			s.levels[supply.key] = s.levels[supply.key] or {}
+			s.applied[supply.key] = s.applied[supply.key] or {}
 		end
 		return s
 	end
@@ -112,8 +118,14 @@ local function collectConsumption(d : AmDepotStock) : number
 	return units
 end
 
---- writes the stock amount left after the vehicles took their part
+
+--- writes the stock amount left after the vehicles took their part (while deliveries are switched off, the units are
+--- kept in AmDepotStock.reserve and the stock stays full)
 local function commitStock(ds : AmDepotStock)
+	if ds.reserve ~= nil then
+		ds.reserve = ds.stockLeft
+		return
+	end
 	if ds.stockList < 0 or ds.stockLeft == ds.stockAtStart then
 		return
 	end
@@ -156,17 +168,42 @@ local function updateDepots(s : AmState) : {Engine.Entity : boolean}
 			end
 		end
 
-		for _, ds in pairs(d.stocks) do
+		local accepting = d.enabled ~= false
+		for _, supply in ipairs(config.Supplies) do
+			local ds = d.stocks[supply.key]
 			ds.stockAtStart = 0
+			ds.stockLeft = 0
 			if ds.stockList >= 0 then
-				ds.stockAtStart = api.engine.system.simEntityAtStockSystem.getStockCount(ds.stockList, 0) or 0
-				ds.stockLeft = ds.stockAtStart
-				-- the rule consumes almost nothing, what it does consume goes to the tank as well
+				local count = api.engine.system.simEntityAtStockSystem.getStockCount(ds.stockList, 0) or 0
 				local units = collectConsumption(ds)
-				if units > 0 then
-					ds.tank = ds.tank + units
-					ds.delivered = (ds.delivered or 0) + units
+				if accepting then
+					if ds.reserve ~= nil then
+						-- switched on again: the stock gets the units kept aside back and accepts deliveries
+						count = ds.reserve
+						ds.reserve = nil
+						api.cmd.sendCommand(api.cmd.debug.makeStockSetCargoAmountCmd(ds.stockList, 0, count))
+						log.message(string.format("[advanced_maintenance] depot %d: %s deliveries on, %d units in stock", depot, supply.key, count))
+					elseif units > 0 then
+						-- the rule consumes almost nothing, what it does consume goes to the tank as well
+						ds.tank = ds.tank + units
+						ds.delivered = (ds.delivered or 0) + units
+					end
+				else
+					-- Deliveries switched off: the units are kept aside and the stock is kept full, a full stock is no
+					-- destination for the cargo. What the rule consumes of the full stock is not real and is dropped.
+					local stockList = api.engine.getComponent(ds.stockList, api.type.ComponentType.STOCK_LIST) as Engine.Component.StockList
+					local capacity = stockList ~= nil and stockList.stocks ~= nil and stockList.stocks[1] ~= nil and stockList.stocks[1].capacity or 0
+					if ds.reserve == nil then
+						ds.reserve = count
+						log.message(string.format("[advanced_maintenance] depot %d: %s deliveries off, %d units kept", depot, supply.key, count))
+					end
+					if capacity > 0 and count < capacity then
+						api.cmd.sendCommand(api.cmd.debug.makeStockSetCargoAmountCmd(ds.stockList, 0, capacity))
+					end
+					count = ds.reserve
 				end
+				ds.stockAtStart = count
+				ds.stockLeft = count
 			end
 		end
 	end, api.type.ComponentType.VEHICLE_DEPOT)
@@ -321,6 +358,44 @@ local function updateVehicles(s : AmState, settings : AmSettings, days : number,
 	return stats
 end
 
+-- service range ------------------------------------------------------------------------------------------------------
+
+--- Pays the tools of the service ranges: a new factor pays its first month at once, then every RangeMonthDays. Without
+--- enough tools the construction is rebuilt with factor 1.
+local function updateRanges(s : AmState, days : number)
+	for depot, d in pairs(s.depots) do
+		local constructionEntity = api.engine.system.streetConnectorSystem.getConstructionEntityForDepot(depot)
+		local factor = range.factorOf(constructionEntity)
+		local level = range.levelOf(factor)
+		if level.toolsPerMonth <= 0 then
+			d.rangeFactor = 1
+			d.rangeDays = 0
+		else
+			if d.rangeFactor ~= factor then
+				d.rangeFactor = factor
+				d.rangeDays = config.RangeMonthDays
+			else
+				d.rangeDays = (d.rangeDays or 0) + days
+			end
+			if d.rangeDays >= config.RangeMonthDays then
+				local ds = d.stocks.tools
+				local need = level.toolsPerMonth
+				if ds ~= nil and ds.stockList >= 0 and ds.stockLeft >= need then
+					ds.stockLeft = ds.stockLeft - need
+					d.rangeDays = d.rangeDays - config.RangeMonthDays
+					log.message(string.format("[advanced_maintenance] depot %d: service range x%.2f, %d tools used", depot, factor, need))
+				else
+					-- not enough tools: back to the normal range (the rebuild gives the depot new state if its entity changes)
+					local ok, rebuilt = pcall(range.setFactor, constructionEntity, 1)
+					log.message(string.format("[advanced_maintenance] depot %d: not enough tools for service range x%.2f (%d needed), back to x1%s",
+						depot, factor, need, (ok and rebuilt) and "" or ", rebuild failed: " .. tostring(rebuilt)))
+					d.rangeDays = 0
+				end
+			end
+		end
+	end
+end
+
 -- game script --------------------------------------------------------------------------------------------------------
 
 local function logSummary(s : AmState, settings : AmSettings, stats : PassStats, msPerDay : number)
@@ -332,7 +407,7 @@ local function logSummary(s : AmState, settings : AmSettings, stats : PassStats,
 			if ds ~= nil and ds.stockList >= 0 then
 				withStock = withStock + 1
 				tank = tank + ds.tank
-				stocked = stocked + api.engine.system.simEntityAtStockSystem.getStockCount(ds.stockList, 0)
+				stocked = stocked + (ds.reserve or api.engine.system.simEntityAtStockSystem.getStockCount(ds.stockList, 0))
 			end
 		end
 		parts[#parts + 1] = string.format("%s: %d supplied, %d stocks, in stock %d, taken %.1f",
@@ -345,6 +420,9 @@ end
 
 local script = {
 	update = function(_userParams : table, state : GameScriptState<AmState>, _dt : number) : any
+		if not state:hasEventSubscriptions() then
+			state:subscribeToEvent(config.SupplySwitchEventName)
+		end
 		local raw = state:get() as table
 		local s = loadState(raw)
 		local now = gameTimeMs()
@@ -367,6 +445,7 @@ local script = {
 		local depots = updateDepots(s)
 		local settings = config.clamp(config.fromGame())
 		local stats = updateVehicles(s, settings, dt / msPerDay, depots)
+		updateRanges(s, dt / msPerDay)
 		-- the units the vehicles took leave the stocks
 		for _, d in pairs(s.depots) do
 			for _, ds in pairs(d.stocks) do
@@ -379,6 +458,30 @@ local script = {
 		state:set(s)
 	end,
 
+	--- the delivery switch of a facility window
+	handleEvent = function(_userParams : table, state : GameScriptState<AmState>, _src : string, id : string, name : string, param : any) : any
+		if id ~= config.EventId or name ~= config.SupplySwitchEventName then
+			return
+		end
+		local e = param as AmSupplySwitchEvent
+		if e == nil or e.depot == nil then
+			return
+		end
+		local s = loadState(state:get() as table)
+		local d = s.depots[e.depot]
+		if d == nil then
+			d = { stocks = {} }
+			s.depots[e.depot] = d
+		end
+		-- nil means on, so a facility never switched keeps the default
+		if e.enabled then
+			d.enabled = nil
+		else
+			d.enabled = false
+		end
+		log.message("[advanced_maintenance] depot " .. tostring(e.depot) .. ": deliveries " .. (e.enabled and "on" or "off"))
+		state:set(s)
+	end,
 }
 
 return script
